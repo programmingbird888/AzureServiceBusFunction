@@ -37,13 +37,13 @@ public class Function1
             payload = JsonSerializer.Deserialize<InputPayload>(requestBody, _serializerOptions);
             if (payload == null || string.IsNullOrEmpty(payload.MessageId) || string.IsNullOrEmpty(payload.Content))
             {
-                return CreateBadRequestResponse(req, "Invalid payload. MessageId and Content are required.");
+                return await CreateBadRequestResponse(req, "Invalid payload. MessageId and Content are required.");
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to deserialize input JSON.");
-            return CreateBadRequestResponse(req, "Invalid JSON format.");
+            return await CreateBadRequestResponse(req, "Invalid JSON format.");
         }
 
         // Send the message to the Azure Service Bus
@@ -71,10 +71,10 @@ public class Function1
         return response;
     }
 
-    private HttpResponseData CreateBadRequestResponse(HttpRequestData req, string errorMessage)
+    private async Task<HttpResponseData> CreateBadRequestResponse(HttpRequestData req, string errorMessage)
     {
         var response = req.CreateResponse(System.Net.HttpStatusCode.BadRequest);
-        response.WriteString(errorMessage);
+        await response.WriteStringAsync(errorMessage);
         return response;
     }
 }
